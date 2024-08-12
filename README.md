@@ -1,2 +1,2 @@
 # NEURAL
-Neural Networks in C++
+Neural Networks and Matrices in C++

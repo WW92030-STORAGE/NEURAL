@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <cmath>
 #include <omp.h>
-
 // Implementation of a small evolving neural network system WITH A SINGLE OUTPUT
 
 #define DEFAULT_INPUT 2
@@ -335,7 +334,7 @@ class NeuralNetwork {
         start = find(data, ':', previouslayer) + 1;
         for (int in = 0; in <= hidden; in++) {
             int end = find(data, ' ', start);
-            nn.weights[layers + 1][in][0] = std::stod(substring(data, start, end));
+            nn.weights[layers][in][0] = std::stod(substring(data, start, end));
             start = end + 1;
         }
     

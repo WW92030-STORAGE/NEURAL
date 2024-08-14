@@ -277,15 +277,15 @@ class NeuralNetwork {
         nodegrads[HIDDEN_LAYERS + 1][0] = Eprime;
         // Now for successive layers:
         for (int i = HIDDEN_LAYERS; i >= 0; i--) {
-            if (verbose) {
+            if (verbose | 1) {
                 std::cout << "LAYER " << i + 1 << " TO " << i << "\n";
                 std::cout << "SHAPE OF LAYER " << weights[i].rows() << " " << weights[i].cols() << "\n";
-                std::cout << "SHAPE OF OUTPUT VALUES " << values[i + 1].rows() << "\n";
-                std::cout << "SHAPE OF INPUT VALUES " << values[i].rows() << "\n";
+                std::cout << "SHAPE OF OUTPUT VALUES " << values[i + 1].rows() << " " << values[i + 1].cols() << "\n";
+                std::cout << "SHAPE OF INPUT VALUES " << values[i].rows() << " " << values[i].cols() << "\n";
                 std::cout << "NUMBER OF GRADIENTS TO COMPUTE (VALUE OF K) " << values[i].rows() - 1 << "\n";
                 std::cout << "NUMBER OF COMPONENTS IN GRADIENT (VALUE OF J) " << nodegrads[i + 1].size() << "\n";
-                std::cout << "VALUES TO CONSIDER " << values[i + 1].transpose() << "\n";
-                std::cout << "WEIGHTS TO CONSIDER " << weights[i] << "\n";
+                // std::cout << "VALUES TO CONSIDER " << values[i + 1].transpose() << "\n";
+                // std::cout << "WEIGHTS TO CONSIDER " << weights[i] << "\n";
             }
             for (int k = 0; k < values[i].rows() - 1; k++) { // node k on layer i
                 double sum = 0;
@@ -316,6 +316,61 @@ class NeuralNetwork {
                     // d(sqerror) / d(weight[i][j][k]) = d(sqerror) / d(v'[i + 1][k]) * d(v'[i + 1][k]) / d(v[i + 1][k]) * d(v[i + 1][k]) / d(w)
                     if (i == HIDDEN_LAYERS) gradients.weights[i](j, k) = nodegrads[i + 1][k] * finalad(values[i + 1](k)) * values[i](j);
                     else gradients.weights[i](j, k) = nodegrads[i + 1][k] * activd(values[i + 1](k)) * values[i](j);
+                }
+            }
+        }
+        
+        if (verbose) std::cout << "GRADIENTS " << "\n" << gradients.toString() << "\n";
+        
+        for (int i = 0; i < weights.size(); i++) {
+            for (int j = 0; j < weights[i].rows(); j++) {
+                for (int k = 0; k < weights[i].cols(); k++) {
+                    weights[i](j, k) -= gradients.weights[i](j, k) * alpha;
+                    if (weights[i](j, k) < -1 * WEIGHTLIMIT) weights[i](j, k) = -1 * WEIGHTLIMIT;
+                    if (weights[i](j, k) > WEIGHTLIMIT) weights[i](j, k) = WEIGHTLIMIT;
+                }
+            }
+        }
+    }
+
+    // Backpropagation using Eigen's data structures
+    void backprop(double yhat, double y, double alpha, bool verbose = false) {
+        double Eprime = yhat - y;
+
+        std::vector<Eigen::VectorXd> nodegrads(1, Eigen::VectorXd(INPUT_SIZE)); // Gradients d(squared error) / dN'
+        for (int i = 0; i < HIDDEN_LAYERS; i++) nodegrads.push_back(Eigen::VectorXd(NODES_PER_HIDDEN));
+        nodegrads.push_back(Eigen::VectorXd(1));
+
+         NeuralNetwork gradients(*this); // weight gradients. 
+        // gradients.weights[l][i][j] is the gradient of the edge starting on node i on layer l leading into node j on layer l + 1
+        
+        // For the output layer it simply has d(sqerror) / d(output')
+        nodegrads[HIDDEN_LAYERS + 1](0) = Eprime;
+
+        for (int i = HIDDEN_LAYERS; i >= 0; i--) {
+            // nodegrads[i](k) = SUM(j = 0 ... nodegrads[i + 1].size - 1) OF nodegrads[i + 1](j) * finalad(values[i + 1][j]) * weights[i](k, j)
+            // This translates to nodegrads[i] = weights[i] * (elementwise nodegrads[i + 1] * finalad(values[i + 1]))
+
+            Eigen::VectorXd factor(nodegrads[i + 1].size());
+            for (int j = 0; j < nodegrads[i + 1].size(); j++) {
+                if (i == HIDDEN_LAYERS) factor(j) = nodegrads[i + 1](j) * finalad(values[i + 1](j));
+                else factor(j) = nodegrads[i + 1](j) * activd(values[i + 1](j));
+            }
+
+            // std::cout << "FACTOR LENGTH " << factor.rows() << " " << factor.cols() << "\n" << "WEIGHTS SHAPE " << weights[i].rows() << " " << weights[i].cols() << "\n";
+
+            nodegrads[i] = weights[i] * factor;
+            nodegrads[i] = nodegrads[i].head(nodegrads[i].rows() - 1);
+        }
+
+        // Now to look at the weights
+        
+        for (int i = HIDDEN_LAYERS; i >= 0; i--) { // layer i --> layer (i + 1)
+            for (int j = 0; j < weights[i].rows(); j++) {
+                for (int k = 0; k < weights[i].cols(); k++) {
+                    // d(sqerror) / d(weight[i][j][k]) = d(sqerror) / d(v'[i + 1][k]) * d(v'[i + 1][k]) / d(v[i + 1][k]) * d(v[i + 1][k]) / d(w)
+                    if (i == HIDDEN_LAYERS) gradients.weights[i](j, k) = nodegrads[i + 1](k) * finalad(values[i + 1](k)) * values[i](j);
+                    else gradients.weights[i](j, k) = nodegrads[i + 1](k) * activd(values[i + 1](k)) * values[i](j);
                 }
             }
         }

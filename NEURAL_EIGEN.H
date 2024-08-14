@@ -453,7 +453,7 @@ double randrad() { return 2 * (0.5 - randf()); }
 int n = 10000;
 
 void circles(vector<vector<double> > centers, vector<double> radii) {
-    NeuralNetwork nn = Genetic::randomAI(1, centers[0].size(), 1, 10);
+    NeuralNetwork nn = Genetic::randomAI(1, centers[0].size(), 3, 200);
     
     cout << nn.toString() << endl;
     cout << "BEGIN\n";

@@ -1,5 +1,5 @@
-#ifndef NEURAL_H
-#define NEURAL_H
+#ifndef NEURAL_EIGEN_H
+#define NEURAL_EIGEN_H
 
 #include <iostream>
 #include <Eigen/Dense>
@@ -441,51 +441,6 @@ NeuralNetwork mutate(NeuralNetwork nn, double radius = 64) {
     return res;
 }
 
-}
-
-#include <cfloat>
-#include <climits>
-using namespace std;
-
-double randf() { return (double)(rand()) / (double)(RAND_MAX); }
-double randrad() { return 2 * (0.5 - randf()); }
-
-int n = 10000;
-
-void circles(vector<vector<double> > centers, vector<double> radii) {
-    NeuralNetwork nn = Genetic::randomAI(1, centers[0].size(), 3, 200);
-    
-    cout << nn.toString() << endl;
-    cout << "BEGIN\n";
-    
-    int good = 0;
-    int bad = 0;
-    
-    for (int i = 0; i < n; i++) {
-        vector<double> v(nn.INPUT_SIZE);
-        for (int j = 0; j < nn.INPUT_SIZE; j++) v[j] = 16 * randrad();
-        double res = -1;
-        for (int i = 0; i < centers.size(); i++) {
-            double rsq = 0;
-            for (int j = 0; j < nn.INPUT_SIZE; j++) rsq += (v[j] - centers[i][j]) * (v[j] - centers[i][j]);
-            if (rsq < radii[i] * radii[i]) res = 1;
-        }
-        
-        double yhat = nn.eval(v);
-        // std::cout << yhat << " " << res <<"\n";
-        nn.backpropsimple(yhat, res, 0.01);
-        
-        if (abs(res - yhat) < abs(res + yhat)) good++;
-        else bad++;
-        
-        if (i % (n / 100) == 0 && i > 0) {
-            std::cout << "ITERATIONS " << i - (n / 100) << " - " << i << " | " << good << " PASS / " << bad << " FAIL\n";
-            good = 0;
-            bad = 0;
-        }
-        
-        // std::cout << nn.toString() << "\n";
-    }
 }
 
 #endif

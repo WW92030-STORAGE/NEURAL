@@ -7,7 +7,6 @@
 #include <climits>
 #include <algorithm>
 #include <cmath>
-#include <omp.h>
 // Implementation of a small evolving neural network system WITH A SINGLE OUTPUT
 
 #define DEFAULT_INPUT 2
@@ -41,8 +40,8 @@ class NeuralNetwork {
     double WEIGHTLIMIT = (1<<16);
     
     int edges = 0;
-    std::vector<std::vector<std::vector<double>>> weights;
-    std::vector<std::vector<double>> values;
+    std::vector<std::vector<std::vector<double> > > weights;
+    std::vector<std::vector<double> > values;
     
     bool operator<(const NeuralNetwork& other) { return weights < other.weights; }
     
@@ -54,7 +53,7 @@ class NeuralNetwork {
             }
         }
         
-        values = std::vector<std::vector<double>>();
+        values = std::vector<std::vector<double> >();
         values.push_back(std::vector<double>(INPUT_SIZE + 1, 1));
         for (int i = 0; i < HIDDEN_LAYERS; i++) values.push_back(std::vector<double>(NODES_PER_HIDDEN + 1, 1));
         values.push_back(std::vector<double>(1, 0));
@@ -66,9 +65,9 @@ class NeuralNetwork {
         INPUT_SIZE = other.INPUT_SIZE;
         HIDDEN_LAYERS = other.HIDDEN_LAYERS;
         NODES_PER_HIDDEN = other.NODES_PER_HIDDEN;
-        weights = std::vector<std::vector<std::vector<double>>>();
+        weights = std::vector<std::vector<std::vector<double> > >();
         for (int i = 0; i < other.weights.size(); i++) {
-            weights.push_back(std::vector<std::vector<double>>());
+            weights.push_back(std::vector<std::vector<double> >());
             for (int j = 0; j < other.weights[i].size(); j++) {
                 weights[i].push_back(std::vector<double>());
                 for (int k = 0; k < other.weights[i][j].size(); k++) weights[i][j].push_back(other.weights[i][j][k]);
@@ -80,14 +79,14 @@ class NeuralNetwork {
     
     NeuralNetwork() {
         if (HIDDEN_LAYERS == 0) {
-            weights.push_back(std::vector<std::vector<double>>(INPUT_SIZE + 1, std::vector<double>(1, 1)));
+            weights.push_back(std::vector<std::vector<double> >(INPUT_SIZE + 1, std::vector<double>(1, 1)));
             return;
         }
-        weights = std::vector<std::vector<std::vector<double>>>(1, std::vector<std::vector<double>>(INPUT_SIZE + 1, std::vector<double>(NODES_PER_HIDDEN, 1)));
+        weights = std::vector<std::vector<std::vector<double> > >(1, std::vector<std::vector<double> >(INPUT_SIZE + 1, std::vector<double>(NODES_PER_HIDDEN, 1)));
         for (int i = 1; i < HIDDEN_LAYERS; i++) {
-            weights.push_back(std::vector<std::vector<double>>(NODES_PER_HIDDEN + 1, std::vector<double>(NODES_PER_HIDDEN, 1)));
+            weights.push_back(std::vector<std::vector<double> >(NODES_PER_HIDDEN + 1, std::vector<double>(NODES_PER_HIDDEN, 1)));
         }
-        weights.push_back(std::vector<std::vector<double>>(NODES_PER_HIDDEN + 1, std::vector<double>(1, 1)));
+        weights.push_back(std::vector<std::vector<double> >(NODES_PER_HIDDEN + 1, std::vector<double>(1, 1)));
         
         init();
     }
@@ -98,14 +97,14 @@ class NeuralNetwork {
         NODES_PER_HIDDEN = primogenitor;
         
         if (HIDDEN_LAYERS == 0) {
-            weights.push_back(std::vector<std::vector<double>>(INPUT_SIZE + 1, std::vector<double>(1, 1)));
+            weights.push_back(std::vector<std::vector<double> >(INPUT_SIZE + 1, std::vector<double>(1, 1)));
             return;
         }
-        weights = std::vector<std::vector<std::vector<double>>>(1, std::vector<std::vector<double>>(INPUT_SIZE + 1, std::vector<double>(NODES_PER_HIDDEN, 1)));
+        weights = std::vector<std::vector<std::vector<double> > >(1, std::vector<std::vector<double> >(INPUT_SIZE + 1, std::vector<double>(NODES_PER_HIDDEN, 1)));
         for (int i = 1; i < HIDDEN_LAYERS; i++) {
-            weights.push_back(std::vector<std::vector<double>>(NODES_PER_HIDDEN + 1, std::vector<double>(NODES_PER_HIDDEN, 1)));
+            weights.push_back(std::vector<std::vector<double> >(NODES_PER_HIDDEN + 1, std::vector<double>(NODES_PER_HIDDEN, 1)));
         }
-        weights.push_back(std::vector<std::vector<double>>(NODES_PER_HIDDEN + 1, std::vector<double>(1, 1)));
+        weights.push_back(std::vector<std::vector<double> >(NODES_PER_HIDDEN + 1, std::vector<double>(1, 1)));
         
         init();
     }
@@ -226,7 +225,7 @@ class NeuralNetwork {
         // There are N + 1 layers of weights. Layer i (weights[i]) forms a matrix of weights from Layer i to Layer i + 1
         // weights[i][j][k] is the weight connecting node j in layer i to node k in layer i + 1
         
-        std::vector<std::vector<double>> nodegrads(1, std::vector<double>(INPUT_SIZE + 1, 0)); // Gradients d(squared error) / dN'
+        std::vector<std::vector<double> > nodegrads(1, std::vector<double>(INPUT_SIZE + 1, 0)); // Gradients d(squared error) / dN'
         for (int i = 0; i < HIDDEN_LAYERS; i++) nodegrads.push_back(std::vector<double>(NODES_PER_HIDDEN + 1, 0));
         nodegrads.push_back(std::vector<double>(1, 0));
         

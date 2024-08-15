@@ -1,3 +1,4 @@
+
 #ifndef NEURAL_EIGEN_H
 #define NEURAL_EIGEN_H
 
@@ -168,6 +169,8 @@ class NeuralNetwork {
 
         data = indata.transpose() * weights[0];
 
+        std::cout << "NEW DATA HAS SHAPE " << data.rows() << " " << data.cols() << "\n";
+
         for (int i = 0; i < data.rows(); i++) data(i) = activation(data(i));
 
         values[1] = Eigen::VectorXd(NODES_PER_HIDDEN + 1);
@@ -277,7 +280,7 @@ class NeuralNetwork {
         nodegrads[HIDDEN_LAYERS + 1][0] = Eprime;
         // Now for successive layers:
         for (int i = HIDDEN_LAYERS; i >= 0; i--) {
-            if (verbose | 1) {
+            if (verbose) {
                 std::cout << "LAYER " << i + 1 << " TO " << i << "\n";
                 std::cout << "SHAPE OF LAYER " << weights[i].rows() << " " << weights[i].cols() << "\n";
                 std::cout << "SHAPE OF OUTPUT VALUES " << values[i + 1].rows() << " " << values[i + 1].cols() << "\n";
@@ -497,5 +500,85 @@ NeuralNetwork mutate(NeuralNetwork nn, double radius = 64) {
 }
 
 }
+
+/*
+
+// EXAMPLE CODE
+
+
+
+#include <bits/stdc++.h>
+#include <chrono>   
+using namespace std;
+
+double randf() { return (double)(rand()) / (double)(RAND_MAX); }
+double randrad() { return 2 * (0.5 - randf()); }
+
+int n = 100000;
+
+void circles(vector<vector<double>> centers = {{8, 4}, {-10, -8}}, vector<double> radii = {8, 6}) {
+    NeuralNetwork nn = Genetic::randomAI(1, centers[0].size(), 2, 10);
+    
+    cout << nn.toString() << endl;
+    
+    int good = 0;
+    int bad = 0;
+    
+    for (int i = 0; i < n; i++) {
+        vector<double> v(nn.INPUT_SIZE);
+        for (int j = 0; j < nn.INPUT_SIZE; j++) v[j] = 16 * randrad();
+        double res = -1;
+        for (int i = 0; i < centers.size(); i++) {
+            double rsq = 0;
+            for (int j = 0; j < nn.INPUT_SIZE; j++) rsq += (v[j] - centers[i][j]) * (v[j] - centers[i][j]);
+            if (rsq < radii[i] * radii[i]) res = 1;
+        }
+        
+        double yhat = nn.eval(v);
+        nn.backpropsimple(yhat, res, 0.01, false);
+        
+        if (abs(res - yhat) < abs(res + yhat)) good++;
+        else bad++;
+        
+        if (i % (n / 100) == 0 && i > 0) {
+            std::cout << "ITERATIONS " << i - (n / 100) << " - " << i << " | " << good << " PASS / " << bad << " FAIL\n";
+            good = 0;
+            bad = 0;
+        }
+        
+        // std::cout << nn.toString() << "\n";
+    }
+}
+
+int main()
+{
+    srand(time(0));
+
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    
+    // circles();
+
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << std::endl;
+    
+    
+    // return 0;
+    
+    NeuralNetwork res = Genetic::randomAI(16, 10, 10, 10);
+    cout << res.toString() << endl;
+    
+    NeuralNetwork res2 = NeuralNetwork::readIn(res.toString());
+    cout << res2.toString();
+
+    res.eval(std::vector<double>(16, 1));
+    
+    
+
+    return 0;
+}
+
+*/
 
 #endif

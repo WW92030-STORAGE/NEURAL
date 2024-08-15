@@ -1,4 +1,4 @@
 # NEURAL
 Neural Networks and Matrices in C++
 
-- TODO - Reimplementation using Eigen
+- TODO - Use Eigen to do backpropagation.

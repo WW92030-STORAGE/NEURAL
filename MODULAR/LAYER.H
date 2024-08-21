@@ -1,3 +1,6 @@
+#ifndef LAYER_H
+#define LAYER_H
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -6,6 +9,10 @@
 #include <algorithm>
 #include <ctime>
 #include <cmath>
+
+// Simple implementation of a convolutional neural network. Convolutions do not take elements from outside the input arrays.
+// Based on this article https://medium.com/@kattarajesh2001/convolutional-neural-network-from-scratch-0d7513d62923
+// This one is more modular -- instead of the entire NN being a class we have classes for layers. You will have to arrange them into the CNN.
 
 // A layer takes in a (in_n)x(in_m) vector and returns an (out_n)x(out_m) vector.
 class Layer {
@@ -211,3 +218,5 @@ class Layer {
         return res;
     }
 };
+
+#endif

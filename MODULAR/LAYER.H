@@ -199,7 +199,7 @@ class Layer {
         int n = std::min(a.size(), b.size());
         int m = std::min(a[0].size(), b[0].size());
         std::vector<std::vector<double>> res(n, std::vector<double>(m, 0));
-        for (int i = 0x; i < n; i++) {
+        for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) res[i][j] = a[i][j] - b[i][j];
         }
         return res;

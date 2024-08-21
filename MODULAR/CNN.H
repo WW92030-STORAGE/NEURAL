@@ -1,7 +1,7 @@
 #ifndef CNN_H
 #define CNN_H
 
-#include "MODULAR_LAYER.H"
+#include "LAYER.H"
 
 // Simple implementation of a convolutional neural network. Convolutions do not take elements from outside the input arrays.
 // Based on this article https://medium.com/@kattarajesh2001/convolutional-neural-network-from-scratch-0d7513d62923

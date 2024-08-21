@@ -3,6 +3,10 @@
 
 #include "MODULAR_LAYER.H"
 
+// Simple implementation of a convolutional neural network. Convolutions do not take elements from outside the input arrays.
+// Based on this article https://medium.com/@kattarajesh2001/convolutional-neural-network-from-scratch-0d7513d62923
+// This one is more modular -- instead of the entire NN being a class we have classes for layers. You will have to arrange them into the CNN.
+
 // A Convolution Layer uses a kernel of size (n)x(m) to produce the output.
 // Given the input array size and the kernel size, the output size is fixed because the kernel moves in a fixed pattern.
 class ConvLayer : public Layer {

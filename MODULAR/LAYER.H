@@ -230,6 +230,13 @@ class SigmoidLayer : public Layer {
         in_m = 1;
     }
     
+    SigmoidLayer(int a) {
+        in_n = a;
+        in_m = 1;
+        out_n = a;
+        out_m = 1;
+    }
+    
     SigmoidLayer(int a, int b) {
         in_n = a;
         in_m = b;
@@ -286,6 +293,13 @@ class ReLULayer : public Layer {
         out_m = 1;
         in_n = 1;
         in_m = 1;
+    }
+    
+    ReLULayer(int a) {
+        in_n = a;
+        in_m = 1;
+        out_n = a;
+        out_m = 1;
     }
     
     ReLULayer(int a, int b) {

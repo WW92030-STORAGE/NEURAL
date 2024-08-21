@@ -166,6 +166,7 @@ EXAMPLE CODE
 
 
 
+#include <iostream>
 #include "CNN_EIGEN.H"
 #include "Eigen/Dense"
 
@@ -369,11 +370,5 @@ int main()
     
     return 0;
 }
-
-/*
-
-g++ -I eigen-3.4.0 main.cpp -o main 
-
-*/
 
 */

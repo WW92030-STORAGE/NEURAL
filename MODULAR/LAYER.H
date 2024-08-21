@@ -219,4 +219,122 @@ class Layer {
     }
 };
 
+// Activation LAYERS
+
+class SigmoidLayer : public Layer {
+    public:
+    SigmoidLayer() {
+        out_n = 1;
+        out_m = 1;
+        in_n = 1;
+        in_m = 1;
+    }
+    
+    SigmoidLayer(int a, int b) {
+        in_n = a;
+        in_m = b;
+        out_n = a;
+        out_m = b;
+    }
+    
+    SigmoidLayer(const SigmoidLayer& other) {
+        out_n = other.out_n;
+        out_m = other.out_m;
+        in_n = other.in_n;
+        in_m = other.in_m;
+    }
+    
+    double activation(double x) {
+        return std::tanh(x);
+    }
+    double deriv(double x, double y) {
+        return 1 - (y * y);
+    }
+    
+    std::vector<std::vector<double>> compute(std::vector<std::vector<double>> input) {
+        std::vector<std::vector<double>> res;
+        for (auto i : input) {
+            std::vector<double> v;
+            for (auto j : i) v.push_back(activation(j));
+            res.push_back(v);
+        }
+        return res;
+    }
+    
+    std::vector<std::vector<double>> elementgrads(std::vector<std::vector<double>> nextlayergradient, std::vector<std::vector<double>> inputs) {
+        std::vector<std::vector<double>> res;
+        for (int i = 0; i < nextlayergradient.size() && i < inputs.size(); i++) {
+            std::vector<double> v;
+            for (int j = 0; j < nextlayergradient[i].size() && j < inputs[i].size(); j++) {
+                // (dE/dY) * (dY/dX)
+                v.push_back(nextlayergradient[i][j] * deriv(inputs[i][j], activation(inputs[i][j])));
+            }
+            res.push_back(v);
+        }
+        return res;
+    }
+    
+    std::vector<std::vector<double>> backprop(std::vector<std::vector<double>> nextlayergradient, std::vector<std::vector<double>> inputs, double alpha = 0.01, bool VERBOSE = false) {
+        return elementgrads(nextlayergradient, inputs);
+    }
+};
+
+class ReLULayer : public Layer {
+    public:
+    ReLULayer() {
+        out_n = 1;
+        out_m = 1;
+        in_n = 1;
+        in_m = 1;
+    }
+    
+    ReLULayer(int a, int b) {
+        in_n = a;
+        in_m = b;
+        out_n = a;
+        out_m = b;
+    }
+    
+    ReLULayer(const ReLULayer& other) {
+        out_n = other.out_n;
+        out_m = other.out_m;
+        in_n = other.in_n;
+        in_m = other.in_m;
+    }
+    
+    double activation(double x) {
+        return (x > 0) ? x : 0;
+    }
+    double deriv(double x, double y) {
+        return (y == 0) ? 0 : 1;
+    }
+    
+    std::vector<std::vector<double>> compute(std::vector<std::vector<double>> input) {
+        std::vector<std::vector<double>> res;
+        for (auto i : input) {
+            std::vector<double> v;
+            for (auto j : i) v.push_back(activation(j));
+            res.push_back(v);
+        }
+        return res;
+    }
+    
+    std::vector<std::vector<double>> elementgrads(std::vector<std::vector<double>> nextlayergradient, std::vector<std::vector<double>> inputs) {
+        std::vector<std::vector<double>> res;
+        for (int i = 0; i < nextlayergradient.size() && i < inputs.size(); i++) {
+            std::vector<double> v;
+            for (int j = 0; j < nextlayergradient[i].size() && j < inputs[i].size(); j++) {
+                // (dE/dY) * (dY/dX)
+                v.push_back(nextlayergradient[i][j] * deriv(inputs[i][j], activation(inputs[i][j])));
+            }
+            res.push_back(v);
+        }
+        return res;
+    }
+    
+    std::vector<std::vector<double>> backprop(std::vector<std::vector<double>> nextlayergradient, std::vector<std::vector<double>> inputs, double alpha = 0.01, bool VERBOSE = false) {
+        return elementgrads(nextlayergradient, inputs);
+    }
+};
+
 #endif

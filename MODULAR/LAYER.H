@@ -217,6 +217,19 @@ class Layer {
         }
         return res;
     }
+    
+    static std::vector<std::vector<double>> padconst(std::vector<std::vector<double>> v, int side, double val) {
+        std::vector<std::vector<double>> res(v.size() + side * 2, std::vector<double>(v[0].size() + 2 * side, 0));
+        for (int i = 0; i < res.size(); i++) {
+            for (int j = 0; j < res[i].size(); j++) {
+                int relx = i - side;
+                int rely = j - side;
+                if (relx < 0 || rely < 0 || relx >= v.size() || rely >= v[relx].size())res[i][j] = val;
+                else res[i][j] = v[relx][rely];
+            }
+        }
+        return res;
+    }
 };
 
 // Activation LAYERS

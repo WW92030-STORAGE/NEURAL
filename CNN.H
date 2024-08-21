@@ -520,9 +520,9 @@ double LR = 0.01;
 void nntest2(bool VERBOSE = false, int threshold = 50 * 16) {
     if (VERBOSE) cout << "BEGIN CNN TEST\n";
     ConvLayer layer(Layer::random(4, 4, 1), Layer::random(7, 7, 1));
-    SigmoidLayer act(7, 7);
-    ConvLayer layer2(Layer::random(4, 4, 1), Layer::random(3, 3, 1));
-    SigmoidLayer act2(3, 3);
+    ReLULayer act(7, 7);
+    ConvLayer layer2(Layer::random(4, 4, 1), Layer::random(4, 4, 1));
+    ReLULayer act2(4, 4);
     ConvLayer layer3(Layer::random(4, 4, 1), Layer::random(1, 1, 1));
     SigmoidLayer act3(1, 1);
     
@@ -707,7 +707,7 @@ int main()
     
     
     
-    nntest(false);
+    nntest2(false);
     
     return 0;
 }
